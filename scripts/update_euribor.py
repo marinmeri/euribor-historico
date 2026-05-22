@@ -1,6 +1,5 @@
 import requests
 import pandas as pd
-from datetime import date
 import os
 
 TENORES = {
@@ -27,8 +26,9 @@ def descargar_tenor(serie, start):
 
 def main():
     if os.path.exists(CSV_PATH):
-        existing = pd.read_csv(CSV_PATH, parse_dates=['date'])
-        last_date = existing['date'].max().strftime('%Y-%m')
+        existing = pd.read_csv(CSV_PATH)
+        existing['date'] = existing['date'].astype(str)
+        last_date = existing['date'].max()
         start = last_date
         print(f"CSV existente. Actualizando desde {start}...")
     else:
@@ -41,6 +41,7 @@ def main():
         print(f"  Descargando {tenor}...")
         df = descargar_tenor(serie, start)
         df.columns = ['date', tenor]
+        df['date'] = df['date'].astype(str)
         dfs[tenor] = df
 
     merged = dfs['1m']
